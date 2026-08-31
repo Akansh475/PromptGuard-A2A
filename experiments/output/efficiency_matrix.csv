@@ -1,0 +1,7 @@
+Evaluation Metric,Baseline MAS (Unprotected),Traditional Perimeter Filter,ProvGuard-MAS (Our Defense),Delta vs Traditional Method
+Attack Success Rate (ASR),100.0%,100.0%,0.0%,-100.0% (Attacks Eliminated)
+Unauthorized Tool Execution (UTER),100.0%,100.0%,0.0%,-100.0% (Zero Dangerous Calls)
+Containment Efficiency Ratio,0.0%,0.0%,100.0%,+100.0% Containment Gain
+False Positive Rate (FPR),0.0%,20.0%,0.0%,-20.0% (Zero Benign Blocking)
+Mean Runtime Latency,0.20 ms,0.17 ms,0.64 ms,-276.5% Faster Processing
+Max Propagation Depth,1 hops,1 hops,1 hops,Early Boundary Isolation

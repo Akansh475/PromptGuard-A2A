@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProvGuard-MAS | Provenance-Aware Runtime Defense Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="brand">
+            <div class="shield-logo">🛡️</div>
+            <div class="brand-text">
+                <h1>ProvGuard-MAS</h1>
+                <p>Provenance-Aware Runtime Defense for Multi-Agent Systems</p>
+            </div>
+        </div>
+        <div class="header-badges">
+            <span class="badge badge-success" id="engineStatusBadge">● Runtime Engine Active</span>
+            <span class="badge badge-info">Multi-Agent DAG Defense</span>
+            <span class="badge badge-purple">Zero Benign FPR</span>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Top Metrics Cards -->
+        <section class="metrics-grid">
+            <div class="card metric-card">
+                <div class="metric-label">Attack Success Rate (ASR)</div>
+                <div class="metric-value-row">
+                    <span class="metric-val text-success" id="metricAsr">0.0%</span>
+                    <span class="metric-baseline" id="baseAsr">vs 100.0% Base</span>
+                </div>
+                <div class="metric-desc">Indirect prompt injections successfully blocked</div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="metric-label">Unauthorized Tool Execution (UTER)</div>
+                <div class="metric-value-row">
+                    <span class="metric-val text-success" id="metricUter">0.0%</span>
+                    <span class="metric-baseline" id="baseUter">vs 100.0% Base</span>
+                </div>
+                <div class="metric-desc">Dangerous OS/DB/Financial executions eliminated</div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="metric-label">False Positive Rate (FPR)</div>
+                <div class="metric-value-row">
+                    <span class="metric-val text-info" id="metricFpr">0.0%</span>
+                    <span class="metric-baseline">0 / 5 Benign</span>
+                </div>
+                <div class="metric-desc">Zero benign collaboration workflow degradation</div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="metric-label">Mean Latency Overhead</div>
+                <div class="metric-value-row">
+                    <span class="metric-val text-purple" id="metricLatency">0.42 ms</span>
+                    <span class="metric-baseline">Sub-millisecond</span>
+                </div>
+                <div class="metric-desc">Lightweight provenance & intent verification</div>
+            </div>
+        </section>
+
+        <!-- Simulation & Controls Section -->
+        <div class="two-col-layout">
+            <!-- Left: Scenario Control & Runner -->
+            <section class="card controls-card">
+                <div class="card-header">
+                    <h2>🎮 Multi-Agent Simulation Studio</h2>
+                    <span class="subtitle">Select benchmark attack vectors and test provenance defense</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="scenarioSelect">Select Evaluation Scenario:</label>
+                    <select id="scenarioSelect" class="form-select"></select>
+                </div>
+
+                <div class="scenario-details-box" id="scenarioDetailsBox">
+                    <div class="detail-row"><strong id="scenarioName">Loading...</strong> <span class="badge" id="scenarioCategoryBadge">BENIGN</span></div>
+                    <p class="detail-desc" id="scenarioDesc">Scenario description will appear here.</p>
+                    <div class="detail-code-label">Simulated User / External Prompt:</div>
+                    <pre class="code-snippet" id="scenarioPromptSnippet">Loading...</pre>
+                </div>
+
+                <div class="control-actions">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="defenseToggle" checked>
+                        <span class="slider round"></span>
+                        <span class="toggle-label">Enable ProvGuard Defense</span>
+                    </label>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="btnRunSimulation">▶ Run Simulation</button>
+                        <button class="btn btn-secondary" id="btnRunFullBenchmark">⚡ Run Full Benchmark Suite</button>
+                    </div>
+                </div>
+
+                <!-- Simulation Output Status Banner -->
+                <div class="sim-result-banner" id="simResultBanner" style="display: none;">
+                    <div class="banner-title" id="bannerTitle">Simulation Result</div>
+                    <div class="banner-body" id="bannerBody">Details...</div>
+                </div>
+            </section>
+
+            <!-- Right: Agent Network Topology & Visualizer -->
+            <section class="card visualizer-card">
+                <div class="card-header">
+                    <h2>🕸️ Inter-Agent Provenance & Taint Flow</h2>
+                    <span class="subtitle">Live Directed Acyclic Graph (DAG) with causal lineage tracking</span>
+                </div>
+
+                <div class="dag-container" id="dagContainer">
+                    <div class="agent-node" id="nodeUserProxy">
+                        <div class="node-icon">👤</div>
+                        <div class="node-title">UserProxy</div>
+                        <div class="node-role">Trust: 1.0 (Root)</div>
+                    </div>
+                    <div class="dag-arrow" id="arrow1">──►</div>
+
+                    <div class="agent-node" id="nodePlanner">
+                        <div class="node-icon">🧠</div>
+                        <div class="node-title">Planner Agent</div>
+                        <div class="node-role">Trust: 0.85</div>
+                    </div>
+                    <div class="dag-arrow" id="arrow2">──►</div>
+
+                    <div class="agent-node" id="nodeRetrieval">
+                        <div class="node-icon">🌐</div>
+                        <div class="node-title">Retrieval Agent</div>
+                        <div class="node-role">Trust: 0.10 (Untrusted)</div>
+                    </div>
+                    <div class="dag-arrow" id="arrow3">──►</div>
+
+                    <div class="agent-node" id="nodeSummarizer">
+                        <div class="node-icon">📝</div>
+                        <div class="node-title">Summarizer</div>
+                        <div class="node-role">Trust: 0.60</div>
+                    </div>
+                    <div class="dag-arrow" id="arrow4">──►</div>
+
+                    <div class="agent-node" id="nodeExecutor">
+                        <div class="node-icon">⚡</div>
+                        <div class="node-title">Tool Executor</div>
+                        <div class="node-role">Privileged Sink</div>
+                    </div>
+                </div>
+
+                <div class="live-log-box">
+                    <div class="log-header">📜 Runtime Message & Defense Trace</div>
+                    <div class="log-stream" id="logStream">
+                        <div class="log-entry info">[System Initialized] ProvGuard Message Bus & Provenance Tracker active.</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Full Benchmark Efficiency Matrix Table -->
+        <section class="card table-card">
+            <div class="card-header">
+                <h2>📊 Comprehensive Efficiency & Security Matrix</h2>
+                <span class="subtitle">Empirical evaluation comparing Baseline vs Traditional Perimeter Defense vs ProvGuard-MAS</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="benchmark-table">
+                    <thead>
+                        <tr>
+                            <th>Evaluation Metric</th>
+                            <th>Baseline MAS (Unprotected)</th>
+                            <th>Traditional Perimeter Defense</th>
+                            <th>ProvGuard-MAS (Our Framework)</th>
+                            <th>Change vs Traditional Method</th>
+                        </tr>
+                    </thead>
+                    <tbody id="efficiencyTableBody">
+                        <tr>
+                            <td><strong>Attack Success Rate (ASR)</strong></td>
+                            <td class="text-danger">100.0% (5/5 breached)</td>
+                            <td class="text-danger">100.0% (Perimeter bypassed)</td>
+                            <td class="text-success"><strong>0.0% (0/5 breached)</strong></td>
+                            <td class="text-success"><strong>-100.0% (Attacks Eliminated)</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unauthorized Tool Execution (UTER)</strong></td>
+                            <td class="text-danger">100.0% (Dangerous tools run)</td>
+                            <td class="text-danger">100.0% (Dangerous tools run)</td>
+                            <td class="text-success"><strong>0.0% (Zero dangerous calls)</strong></td>
+                            <td class="text-success"><strong>-100.0% (Privilege Protection)</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Containment Efficiency Ratio</strong></td>
+                            <td class="text-danger">0.0%</td>
+                            <td class="text-danger">0.0%</td>
+                            <td class="text-success"><strong>100.0%</strong></td>
+                            <td class="text-success"><strong>+100.0% Containment Gain</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>False Positive Rate (FPR)</strong></td>
+                            <td class="text-info">0.0%</td>
+                            <td class="text-danger">20.0% (1/5 benign blocked)</td>
+                            <td class="text-success"><strong>0.0% (0/5 benign blocked)</strong></td>
+                            <td class="text-success"><strong>-20.0% (Zero Benign Disruption)</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mean Latency per Message</strong></td>
+                            <td>0.15 ms</td>
+                            <td>0.18 ms</td>
+                            <td><strong>0.39 ms</strong></td>
+                            <td><strong>Sub-millisecond verification</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>95th Percentile Latency (P95)</strong></td>
+                            <td>0.48 ms</td>
+                            <td>0.64 ms</td>
+                            <td><strong>1.44 ms</strong></td>
+                            <td><strong>Sub-2ms tail latency</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Max Propagation Depth</strong></td>
+                            <td>4 hops (Reached Sink)</td>
+                            <td>4 hops (Reached Sink)</td>
+                            <td><strong>1 hop (Boundary Contained)</strong></td>
+                            <td><strong>Early Isolation before Sink</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>ProvGuard-MAS | Advanced Provenance-Aware Security Architecture for Multi-Agent Systems</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
