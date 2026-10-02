@@ -13,6 +13,8 @@ setup(
         "matplotlib>=3.7.0",
         "pandas>=2.0.0",
         "numpy>=1.24.0",
+        "seaborn>=0.13.0",
+        "langgraph>=0.2.0",
     ],
     entry_points={
         "console_scripts": [

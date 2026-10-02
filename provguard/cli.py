@@ -156,6 +156,27 @@ def run_simulate_cmd(args: argparse.Namespace) -> None:
     console.print(f"Actions Taken: {res.defense_actions_taken}")
 
 
+def run_langgraph_cmd(args: argparse.Namespace) -> None:
+    """Runs the LangGraph Multi-Agent Security Benchmark Suite."""
+    from provguard.simulation.scenarios import get_all_benchmark_scenarios, get_benchmark_subset
+    from provguard.simulation.runner import LangGraphBenchmarkRunner
+
+    console.print(
+        Panel(
+            "[bold cyan]ProvGuard-MAS[/bold cyan]: LangGraph Multi-Agent Security Simulation",
+            subtitle="Evaluating 150 Benchmark Workflows across None vs Traditional vs ProvGuard-MAS",
+        )
+    )
+
+    scenarios = get_benchmark_subset(10, 5, 3, 2) if args.quick else get_all_benchmark_scenarios()
+    runner = LangGraphBenchmarkRunner(scenarios=scenarios)
+    out = runner.run_comparative_suite(scenarios=scenarios, show_progress=True)
+    paths = runner.export_results(out, output_dir=args.output_dir)
+
+    console.print(f"\n[bold green]✓ LangGraph Benchmark Complete ({len(scenarios)} scenarios)![/bold green]")
+    console.print(f"Results saved to: [cyan]{args.output_dir}[/cyan]")
+
+
 def run_web_cmd(args: argparse.Namespace) -> None:
     """Launches web server."""
     run_web_server(port=args.port)
@@ -168,6 +189,11 @@ def main() -> None:
     # Benchmark parser
     bench_parser = subparsers.add_parser("benchmark", help="Run comparative benchmark suite")
     bench_parser.add_argument("--json-output", "-j", type=str, default=None, help="Path to save benchmark JSON results")
+
+    # LangGraph parser
+    lg_parser = subparsers.add_parser("langgraph", help="Run LangGraph multi-agent simulation benchmark")
+    lg_parser.add_argument("--quick", action="store_true", help="Run 20-scenario smoke test")
+    lg_parser.add_argument("--output-dir", "-o", type=str, default="experiments/output", help="Directory for output files")
 
     # Simulate parser
     sim_parser = subparsers.add_parser("simulate", help="Simulate a single scenario")
@@ -182,6 +208,8 @@ def main() -> None:
 
     if args.command == "benchmark":
         run_benchmark_cmd(args)
+    elif args.command == "langgraph":
+        run_langgraph_cmd(args)
     elif args.command == "simulate":
         run_simulate_cmd(args)
     elif args.command == "web":
@@ -190,3 +218,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

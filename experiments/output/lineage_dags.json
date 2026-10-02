@@ -1,0 +1,542 @@
+[
+  {
+    "scenario_id": "BENIGN_001",
+    "attack_class": "BENIGN",
+    "is_contained": false,
+    "nodes": [
+      {
+        "message_id": "7556cb63-2cbb-4b78-9eb0-5363166ed808",
+        "source": "user_proxy_01",
+        "target": "retrieval_01",
+        "hop_count": 0,
+        "root_trust": 1.0,
+        "taint_score": 0.0,
+        "content_hash": "a317f4bad254bd866c6baa3f482d89c136134cc83271575b45f925c1c6e9dbe9",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "b016abeb-686a-48c7-b9e1-2ae4c0c02071",
+        "source": "external_doc_9611",
+        "target": "summarizer_01",
+        "hop_count": 0,
+        "root_trust": 0.1,
+        "taint_score": 0.9,
+        "content_hash": "3de8a636c96963dd6f76e0a446d7998094490920bfab56996ca5c0593c6978cb",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "62e635c2-563f-48b9-9532-c70e0333bdf6",
+        "source": "summarizer_01",
+        "target": "planner_01",
+        "hop_count": 1,
+        "root_trust": 0.1,
+        "taint_score": 1.0,
+        "content_hash": "dac232803d0512a47b843032b8a6db55d3b54ee7cea2e946994ba72dbc47e8f6",
+        "transformations": [
+          "INGEST_ROOT",
+          "SUMMARIZE_AND_SYNTHESIZE"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "parent": "7556cb63-2cbb-4b78-9eb0-5363166ed808",
+        "child": "b016abeb-686a-48c7-b9e1-2ae4c0c02071"
+      },
+      {
+        "parent": "b016abeb-686a-48c7-b9e1-2ae4c0c02071",
+        "child": "62e635c2-563f-48b9-9532-c70e0333bdf6"
+      }
+    ]
+  },
+  {
+    "scenario_id": "BENIGN_002",
+    "attack_class": "BENIGN",
+    "is_contained": false,
+    "nodes": [
+      {
+        "message_id": "842c8ff8-a767-4c1f-acbb-fc73232f6ecb",
+        "source": "user_proxy_01",
+        "target": "retrieval_01",
+        "hop_count": 0,
+        "root_trust": 1.0,
+        "taint_score": 0.0,
+        "content_hash": "2517e9bc8f89ef7ef200e158118b6b129503dca8405c36089a4a0cd5049ee7a4",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "6676a486-fe3a-49df-99a8-07acac15ec3f",
+        "source": "external_doc_9590",
+        "target": "summarizer_01",
+        "hop_count": 0,
+        "root_trust": 0.1,
+        "taint_score": 0.9,
+        "content_hash": "c0d584d845571f7df23403753168d23a6d4658817c5057b8efb8762d64b49927",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "de97d117-5a44-493d-a3a3-b92440fe3afd",
+        "source": "summarizer_01",
+        "target": "planner_01",
+        "hop_count": 1,
+        "root_trust": 0.1,
+        "taint_score": 1.0,
+        "content_hash": "7c75d0d6b9a5c29a215967320dd830fc686aff778550a6275ca2ced6258d4369",
+        "transformations": [
+          "INGEST_ROOT",
+          "SUMMARIZE_AND_SYNTHESIZE"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "parent": "842c8ff8-a767-4c1f-acbb-fc73232f6ecb",
+        "child": "6676a486-fe3a-49df-99a8-07acac15ec3f"
+      },
+      {
+        "parent": "6676a486-fe3a-49df-99a8-07acac15ec3f",
+        "child": "de97d117-5a44-493d-a3a3-b92440fe3afd"
+      }
+    ]
+  },
+  {
+    "scenario_id": "BENIGN_003",
+    "attack_class": "BENIGN",
+    "is_contained": false,
+    "nodes": [
+      {
+        "message_id": "70487dc4-d1c3-4ac6-af4a-3d80f30c028e",
+        "source": "user_proxy_01",
+        "target": "retrieval_01",
+        "hop_count": 0,
+        "root_trust": 1.0,
+        "taint_score": 0.0,
+        "content_hash": "a1373fb0d5a7cd7a6a748725e25c41b0bdf80d23b023c2fb24f4480650880569",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "00d00890-6bcd-4ac4-a418-c0233441cded",
+        "source": "external_doc_9749",
+        "target": "summarizer_01",
+        "hop_count": 0,
+        "root_trust": 0.1,
+        "taint_score": 0.9,
+        "content_hash": "07a04c6f93e788434b036bea965c9093a8a9d5a0b0b7d6eca73422fe3d45a580",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "7a96a229-42ba-484d-ae5f-17d370f2c4d3",
+        "source": "summarizer_01",
+        "target": "planner_01",
+        "hop_count": 1,
+        "root_trust": 0.1,
+        "taint_score": 1.0,
+        "content_hash": "a71c574b88f717a90bf7c9b1c5c5996fe9206b25a7b039b58a2cd26415b7b6ef",
+        "transformations": [
+          "INGEST_ROOT",
+          "SUMMARIZE_AND_SYNTHESIZE"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "parent": "70487dc4-d1c3-4ac6-af4a-3d80f30c028e",
+        "child": "00d00890-6bcd-4ac4-a418-c0233441cded"
+      },
+      {
+        "parent": "00d00890-6bcd-4ac4-a418-c0233441cded",
+        "child": "7a96a229-42ba-484d-ae5f-17d370f2c4d3"
+      }
+    ]
+  },
+  {
+    "scenario_id": "BENIGN_004",
+    "attack_class": "BENIGN",
+    "is_contained": false,
+    "nodes": [
+      {
+        "message_id": "38490212-94f7-4a9b-b0a0-a32f06142dcc",
+        "source": "user_proxy_01",
+        "target": "retrieval_01",
+        "hop_count": 0,
+        "root_trust": 1.0,
+        "taint_score": 0.0,
+        "content_hash": "9cebd8354d3988a853963cbfc089b9ff06f7f72c0a6851c3ba77174ed850ea62",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "c270483e-0c1f-41c6-8077-f6390acb454e",
+        "source": "external_doc_9297",
+        "target": "summarizer_01",
+        "hop_count": 0,
+        "root_trust": 0.1,
+        "taint_score": 0.9,
+        "content_hash": "b381fab45b383bf28301e290f471739aba8a091fdfb249fa0cf328d0205f1a41",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "a4196121-1f84-45a3-b695-1d73b99c127e",
+        "source": "summarizer_01",
+        "target": "planner_01",
+        "hop_count": 1,
+        "root_trust": 0.1,
+        "taint_score": 1.0,
+        "content_hash": "fc5755796ae2c1a30fce3b3530646997bdc79246ed1264f95a39c5fd8e8abd66",
+        "transformations": [
+          "INGEST_ROOT",
+          "SUMMARIZE_AND_SYNTHESIZE"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "parent": "38490212-94f7-4a9b-b0a0-a32f06142dcc",
+        "child": "c270483e-0c1f-41c6-8077-f6390acb454e"
+      },
+      {
+        "parent": "c270483e-0c1f-41c6-8077-f6390acb454e",
+        "child": "a4196121-1f84-45a3-b695-1d73b99c127e"
+      }
+    ]
+  },
+  {
+    "scenario_id": "BENIGN_005",
+    "attack_class": "BENIGN",
+    "is_contained": false,
+    "nodes": [
+      {
+        "message_id": "9267c342-6e62-4827-a469-1ad5d54533a1",
+        "source": "user_proxy_01",
+        "target": "retrieval_01",
+        "hop_count": 0,
+        "root_trust": 1.0,
+        "taint_score": 0.0,
+        "content_hash": "89d80df170916e66cc1f707a6ff6da93915ff507390d7ed65b22dcd06da27299",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "89ad5b4e-e205-4c8e-9188-b2fe6ed76d5d",
+        "source": "external_doc_9107",
+        "target": "summarizer_01",
+        "hop_count": 0,
+        "root_trust": 0.1,
+        "taint_score": 0.9,
+        "content_hash": "d72e3c9fea88dd1ac811deec2197d0bc17ef66a3ee5c03548fa8d0f778a83ce2",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "900968eb-2bf6-46ea-b8ae-11eea35f8234",
+        "source": "summarizer_01",
+        "target": "planner_01",
+        "hop_count": 1,
+        "root_trust": 0.1,
+        "taint_score": 1.0,
+        "content_hash": "8e0619afb81db347c210d230dcf1e18e87b0697f84cf8ecb4560bd10c6c21b3c",
+        "transformations": [
+          "INGEST_ROOT",
+          "SUMMARIZE_AND_SYNTHESIZE"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "parent": "9267c342-6e62-4827-a469-1ad5d54533a1",
+        "child": "89ad5b4e-e205-4c8e-9188-b2fe6ed76d5d"
+      },
+      {
+        "parent": "89ad5b4e-e205-4c8e-9188-b2fe6ed76d5d",
+        "child": "900968eb-2bf6-46ea-b8ae-11eea35f8234"
+      }
+    ]
+  },
+  {
+    "scenario_id": "BENIGN_006",
+    "attack_class": "BENIGN",
+    "is_contained": false,
+    "nodes": [
+      {
+        "message_id": "17a65fa9-4d44-4c8a-902d-f090633fd3b0",
+        "source": "user_proxy_01",
+        "target": "retrieval_01",
+        "hop_count": 0,
+        "root_trust": 1.0,
+        "taint_score": 0.0,
+        "content_hash": "6f64a53d7397feed5ae2aaa035883d7ec26dc1e633421cb911bbc38d572ce91e",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "2c4be1b8-b255-4e07-9149-437e9f6a9c4d",
+        "source": "external_doc_5492",
+        "target": "summarizer_01",
+        "hop_count": 0,
+        "root_trust": 0.1,
+        "taint_score": 0.9,
+        "content_hash": "06c91501dd7746a4897c9b82d8e4e36d8753b67bbafdb8154fd3be8282eb5103",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "6efdb614-ee4c-447d-b558-d3b1a2cd496a",
+        "source": "summarizer_01",
+        "target": "planner_01",
+        "hop_count": 1,
+        "root_trust": 0.1,
+        "taint_score": 1.0,
+        "content_hash": "40007ee8df31037adaed5233a26479e112a94a7d2c6057ea425d1599571a1594",
+        "transformations": [
+          "INGEST_ROOT",
+          "SUMMARIZE_AND_SYNTHESIZE"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "parent": "17a65fa9-4d44-4c8a-902d-f090633fd3b0",
+        "child": "2c4be1b8-b255-4e07-9149-437e9f6a9c4d"
+      },
+      {
+        "parent": "2c4be1b8-b255-4e07-9149-437e9f6a9c4d",
+        "child": "6efdb614-ee4c-447d-b558-d3b1a2cd496a"
+      }
+    ]
+  },
+  {
+    "scenario_id": "BENIGN_007",
+    "attack_class": "BENIGN",
+    "is_contained": false,
+    "nodes": [
+      {
+        "message_id": "02ba139c-8b61-4f9b-9d45-7cdc4a95f8d9",
+        "source": "user_proxy_01",
+        "target": "retrieval_01",
+        "hop_count": 0,
+        "root_trust": 1.0,
+        "taint_score": 0.0,
+        "content_hash": "757f7968ffe9bda6337117b94a0244af590dca1d495ae010154e3b48315ce601",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "d37e768e-6b59-4f01-b000-58487c22878d",
+        "source": "external_doc_4583",
+        "target": "summarizer_01",
+        "hop_count": 0,
+        "root_trust": 0.1,
+        "taint_score": 0.9,
+        "content_hash": "77bec912fb8b60c2e378295a6d55ef24db0525e41e4bd9f3ca4491c413d21b66",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "a8c0bc82-216d-4cea-a915-53b07ba66ba7",
+        "source": "summarizer_01",
+        "target": "planner_01",
+        "hop_count": 1,
+        "root_trust": 0.1,
+        "taint_score": 1.0,
+        "content_hash": "38c47c32cfcba80118057a5a5f46026de31a43b2a1efa774f27959ae13c38350",
+        "transformations": [
+          "INGEST_ROOT",
+          "SUMMARIZE_AND_SYNTHESIZE"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "parent": "02ba139c-8b61-4f9b-9d45-7cdc4a95f8d9",
+        "child": "d37e768e-6b59-4f01-b000-58487c22878d"
+      },
+      {
+        "parent": "d37e768e-6b59-4f01-b000-58487c22878d",
+        "child": "a8c0bc82-216d-4cea-a915-53b07ba66ba7"
+      }
+    ]
+  },
+  {
+    "scenario_id": "BENIGN_008",
+    "attack_class": "BENIGN",
+    "is_contained": false,
+    "nodes": [
+      {
+        "message_id": "4feddfa9-4a04-4f29-a980-574e1161e10d",
+        "source": "user_proxy_01",
+        "target": "retrieval_01",
+        "hop_count": 0,
+        "root_trust": 1.0,
+        "taint_score": 0.0,
+        "content_hash": "e696a3380aa658e647d5e9c1b966072f0a65ec31e92c30a3784cb08f156ef235",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "41d91437-672c-4900-964b-ec8988e18a47",
+        "source": "external_doc_3441",
+        "target": "summarizer_01",
+        "hop_count": 0,
+        "root_trust": 0.1,
+        "taint_score": 0.9,
+        "content_hash": "1bce3ce0d7a972805b00690200ea3d44be1cb62ba89e1a35c1394f5009853a37",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "d66f28bb-b36f-43af-b488-25f240b30886",
+        "source": "summarizer_01",
+        "target": "planner_01",
+        "hop_count": 1,
+        "root_trust": 0.1,
+        "taint_score": 1.0,
+        "content_hash": "4a71cafc7200d01ffb1b4ea2508634669a6cd92fc6e529ce46f4ab9e66c41697",
+        "transformations": [
+          "INGEST_ROOT",
+          "SUMMARIZE_AND_SYNTHESIZE"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "parent": "4feddfa9-4a04-4f29-a980-574e1161e10d",
+        "child": "41d91437-672c-4900-964b-ec8988e18a47"
+      },
+      {
+        "parent": "41d91437-672c-4900-964b-ec8988e18a47",
+        "child": "d66f28bb-b36f-43af-b488-25f240b30886"
+      }
+    ]
+  },
+  {
+    "scenario_id": "BENIGN_009",
+    "attack_class": "BENIGN",
+    "is_contained": false,
+    "nodes": [
+      {
+        "message_id": "4580d4ed-e77a-4961-b946-01b3f9e7a19c",
+        "source": "user_proxy_01",
+        "target": "retrieval_01",
+        "hop_count": 0,
+        "root_trust": 1.0,
+        "taint_score": 0.0,
+        "content_hash": "079cdddb18a52fec495235624082f343c698e95df0f123fe3c86d7bbe1336b6c",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "cab1d513-733a-451b-b807-96243505177e",
+        "source": "external_doc_9577",
+        "target": "summarizer_01",
+        "hop_count": 0,
+        "root_trust": 0.1,
+        "taint_score": 0.9,
+        "content_hash": "5dcc30994eb3f9350f842ab0a318a40005438c8e0dd39d3ee473a8f82fbc5612",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "a5a5900f-dfe6-4e3a-831d-b0f570bdfc67",
+        "source": "summarizer_01",
+        "target": "planner_01",
+        "hop_count": 1,
+        "root_trust": 0.1,
+        "taint_score": 1.0,
+        "content_hash": "cfcf4d26911b996cc6df6c69548f4f12024adefcd86e643f2f9ad60b4365492d",
+        "transformations": [
+          "INGEST_ROOT",
+          "SUMMARIZE_AND_SYNTHESIZE"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "parent": "4580d4ed-e77a-4961-b946-01b3f9e7a19c",
+        "child": "cab1d513-733a-451b-b807-96243505177e"
+      },
+      {
+        "parent": "cab1d513-733a-451b-b807-96243505177e",
+        "child": "a5a5900f-dfe6-4e3a-831d-b0f570bdfc67"
+      }
+    ]
+  },
+  {
+    "scenario_id": "BENIGN_010",
+    "attack_class": "BENIGN",
+    "is_contained": false,
+    "nodes": [
+      {
+        "message_id": "1119594e-ae6e-4ad5-8034-769c5e247a2d",
+        "source": "user_proxy_01",
+        "target": "retrieval_01",
+        "hop_count": 0,
+        "root_trust": 1.0,
+        "taint_score": 0.0,
+        "content_hash": "ec55d977a8e15913dd99a111814a1ad1f04af2b1da1db5969c0b99c60fbc8a89",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "19f36b17-5b37-4bae-b9f3-1aaf88280374",
+        "source": "external_doc_8437",
+        "target": "summarizer_01",
+        "hop_count": 0,
+        "root_trust": 0.1,
+        "taint_score": 0.9,
+        "content_hash": "833293284bf34f9dcd14ab9af32a9fb49a2c60d63ebd768c33a8c742512c5b73",
+        "transformations": [
+          "INGEST_ROOT"
+        ]
+      },
+      {
+        "message_id": "6f096672-1bd6-4b9a-bd1e-ee8eb2547cc1",
+        "source": "summarizer_01",
+        "target": "planner_01",
+        "hop_count": 1,
+        "root_trust": 0.1,
+        "taint_score": 1.0,
+        "content_hash": "064a24a276467ceaa7f36f6d709f1e32c20878e71cd73becdd9eb156e8e663f4",
+        "transformations": [
+          "INGEST_ROOT",
+          "SUMMARIZE_AND_SYNTHESIZE"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "parent": "1119594e-ae6e-4ad5-8034-769c5e247a2d",
+        "child": "19f36b17-5b37-4bae-b9f3-1aaf88280374"
+      },
+      {
+        "parent": "19f36b17-5b37-4bae-b9f3-1aaf88280374",
+        "child": "6f096672-1bd6-4b9a-bd1e-ee8eb2547cc1"
+      }
+    ]
+  }
+]
