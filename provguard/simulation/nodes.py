@@ -98,15 +98,21 @@ def retrieval_node(state: ProvGuardGraphState, middleware: ProvGuardLangGraphMid
     user_query = state.get("user_query", "")
     session_id = state.get("session_id", "default_session")
     mock_store = state.get("mock_data_store", {})
-
-    # Fetch document from mock store or default
-    retrieved_content = mock_store.get(
-        user_query,
-        mock_store.get(
-            "default",
-            f"External research findings regarding: {user_query}. Benign domain data."
+    # Fetch document from live web/Wikipedia API or fallback mock store
+    use_live_data = state.get("use_live_data", False)
+    if use_live_data:
+        from provguard.simulation.live_retrieval import LiveDataFetcher
+        live_query = state.get("live_retrieval_query", user_query)
+        adv_inj = state.get("live_adversarial_injection", None)
+        retrieved_content, live_meta = LiveDataFetcher.fetch_live_data(live_query, adversarial_injection=adv_inj)
+    else:
+        retrieved_content = mock_store.get(
+            user_query,
+            mock_store.get(
+                "default",
+                f"External research findings regarding: {user_query}. Benign domain data."
+            )
         )
-    )
 
     # Ingestion provenance creates an UNTRUSTED_EXTERNAL origin record
     ext_origin_id = f"external_doc_{abs(hash(retrieved_content[:50])) % 10000}"

@@ -65,6 +65,11 @@ class ProvGuardGraphState(TypedDict, total=False):
     # Mock environment datastore (e.g. documents retrieved by external search)
     mock_data_store: Dict[str, str]
 
+    # Live environment retrieval settings
+    use_live_data: bool
+    live_retrieval_query: Optional[str]
+    live_adversarial_injection: Optional[str]
+
     # Security outcome flags
     is_contained: bool
     containment_node: Optional[str]

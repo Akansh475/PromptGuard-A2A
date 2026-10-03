@@ -182,6 +182,35 @@ def run_web_cmd(args: argparse.Namespace) -> None:
     run_web_server(port=args.port)
 
 
+def run_train_model_cmd(args: argparse.Namespace) -> None:
+    """Trains the NLP prompt injection & adversarial intent guardrail model."""
+    from provguard.models.train import train_and_evaluate, MODEL_FILE
+    out_file = args.output or MODEL_FILE
+    console.print(Panel("[bold cyan]ProvGuard-MAS[/bold cyan]: Training ML Guardrail Model"))
+    with console.status("[bold green]Fitting subword/character + word n-gram pipeline..."):
+        meta = train_and_evaluate(out_file)
+    console.print(f"[bold green]✓[/bold green] Model successfully trained and saved to: [cyan]{out_file}[/cyan]")
+    console.print(f"• Samples: [bold]{meta['total_samples']}[/bold] (Benign: {meta['benign_count']}, Adv: {meta['adversarial_count']})")
+    console.print(f"• 5-Fold Cross-Val Accuracy: [bold green]{meta['cv_accuracy_mean']*100:.2f}%[/bold green]")
+    console.print(f"• 5-Fold Cross-Val F1 Score: [bold green]{meta['cv_f1_mean']*100:.2f}%[/bold green]")
+    console.print(f"• Training ROC-AUC: [bold green]{meta['train_roc_auc']:.4f}[/bold green]")
+
+
+def run_live_sim_cmd(args: argparse.Namespace) -> None:
+    """Runs live multi-agent simulation with real-time web retrieval and trained ML protection."""
+    from provguard.simulation.interactive_live import run_live_task, interactive_cli_session
+    if args.query:
+        run_live_task(
+            user_query=args.query,
+            live_target=args.target,
+            adversarial_payload=args.inject,
+            defense_mode=args.mode,
+            verbose=True,
+        )
+    else:
+        interactive_cli_session()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="ProvGuard-MAS: Provenance-Aware Multi-Agent Defense CLI")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -204,6 +233,17 @@ def main() -> None:
     web_parser = subparsers.add_parser("web", help="Launch interactive web dashboard")
     web_parser.add_argument("--port", "-p", type=int, default=8080, help="Web server port")
 
+    # Train model parser
+    train_parser = subparsers.add_parser("train-model", help="Train prompt injection & intent ML guardrail model")
+    train_parser.add_argument("--output", "-o", type=str, default=None, help="Output .joblib artifact path")
+
+    # Live simulation parser
+    live_parser = subparsers.add_parser("live-sim", help="Run live multi-agent simulation on real web/Wikipedia data")
+    live_parser.add_argument("--query", "-q", type=str, default=None, help="User query for live MAS execution")
+    live_parser.add_argument("--target", "-t", type=str, default=None, help="Live target URL or Wikipedia topic")
+    live_parser.add_argument("--inject", "-i", type=str, default=None, help="Adversarial prompt injection payload to test")
+    live_parser.add_argument("--mode", "-m", type=str, default="PROVGUARD", choices=["NONE", "TRADITIONAL", "PROVGUARD"], help="Defense mode")
+
     args = parser.parse_args()
 
     if args.command == "benchmark":
@@ -214,6 +254,10 @@ def main() -> None:
         run_simulate_cmd(args)
     elif args.command == "web":
         run_web_cmd(args)
+    elif args.command == "train-model":
+        run_train_model_cmd(args)
+    elif args.command == "live-sim":
+        run_live_sim_cmd(args)
 
 
 if __name__ == "__main__":

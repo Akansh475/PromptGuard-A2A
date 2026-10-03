@@ -15,6 +15,8 @@ setup(
         "numpy>=1.24.0",
         "seaborn>=0.13.0",
         "langgraph>=0.2.0",
+        "scikit-learn>=1.4.0",
+        "joblib>=1.3.0",
     ],
     entry_points={
         "console_scripts": [

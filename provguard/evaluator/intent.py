@@ -1,20 +1,27 @@
 """
 Intent extraction and indirect prompt injection detection engine.
+Combines a trained machine learning NLP classifier with delimiter smuggling and entropy heuristics.
 """
 
 from __future__ import annotations
 
 import base64
 import binascii
+import logging
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any, Optional
+
 from provguard.core.security import calculate_shannon_entropy
+from provguard.models.detector import TrainedInjectionDetector
+
+logger = logging.getLogger("provguard.evaluator.intent")
 
 
 class IntentAnalyzer:
     """
     Analyzes message textual payloads to detect indirect prompt injections,
     delimiter smuggling, imperative instruction hijacking, and obfuscated attacks.
+    Integrates a trained NLP classifier for continuous risk estimation.
     """
 
     # Delimiter and instruction override signatures
@@ -35,10 +42,10 @@ class IntentAnalyzer:
     ]
 
     @classmethod
-    def scan_for_injections(cls, text: str) -> Tuple[float, List[str]]:
+    def scan_for_injections(cls, text: str, use_ml_model: bool = True) -> Tuple[float, List[str]]:
         """
         Scans content for known injection vectors, delimiter smuggling,
-        and dangerous payload strings.
+        and evaluates with the trained NLP injection detection model.
         Returns (max_risk_score, detected_pattern_names).
         """
         if not text:
@@ -47,18 +54,38 @@ class IntentAnalyzer:
         detected: List[str] = []
         max_score = 0.0
 
-        # 1. Plaintext Regex Scan
+        # 1. Trained Machine Learning Model Evaluation
+        if use_ml_model:
+            try:
+                detector = TrainedInjectionDetector.get_instance()
+                if detector.is_loaded:
+                    ml_prob = detector.predict_probability(text)
+                    if ml_prob >= 0.55:
+                        detected.append(f"TRAINED_ML_DETECTION (P(injection)={ml_prob:.3f})")
+                        max_score = max(max_score, ml_prob)
+            except Exception as e:
+                logger.debug(f"ML detector evaluation skipped: {e}")
+
+        # 2. Plaintext Regex Pattern Scan
         for pattern, label, weight in cls.INJECTION_PATTERNS:
             if re.search(pattern, text, re.IGNORECASE):
                 detected.append(f"{label} ({pattern})")
                 max_score = max(max_score, weight)
 
-        # 2. Obfuscation & Base64 Decoding Check
+        # 3. Obfuscation & Base64 Decoding Check
         b64_matches = re.findall(r"(?:[A-Za-z0-9+/]{4}){3,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?", text)
         for cand in b64_matches:
             if len(cand) >= 16:
                 try:
                     decoded = base64.b64decode(cand, validate=True).decode("utf-8", errors="ignore")
+                    if use_ml_model:
+                        detector = TrainedInjectionDetector.get_instance()
+                        if detector.is_loaded:
+                            dec_prob = detector.predict_probability(decoded)
+                            if dec_prob >= 0.40:
+                                detected.append(f"OBFUSCATED_BASE64_ML_DETECTION (P={dec_prob:.3f})")
+                                max_score = max(max_score, min(1.0, dec_prob + 0.05))
+
                     for pattern, label, weight in cls.INJECTION_PATTERNS:
                         if re.search(pattern, decoded, re.IGNORECASE):
                             detected.append(f"OBFUSCATED_BASE64_{label}")
@@ -66,7 +93,7 @@ class IntentAnalyzer:
                 except (binascii.Error, UnicodeDecodeError):
                     pass
 
-        # 3. High Entropy Check
+        # 4. High Entropy Check
         entropy = calculate_shannon_entropy(text)
         if entropy > 5.2 and len(text) > 40:
             detected.append(f"HIGH_ENTROPY_ANOMALY (entropy={entropy:.2f})")
