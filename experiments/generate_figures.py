@@ -46,73 +46,109 @@ plt.rcParams.update({
 
 def generate_figure_1_architecture(output_dir: str):
     """Figure 1: LangGraph Workflow & ProvGuard Middleware Layer."""
-    fig, ax = plt.subplots(figsize=(11, 6))
+    fig, ax = plt.subplots(figsize=(12, 6.8))
     ax.axis("off")
+    ax.set_xlim(-0.02, 1.02)
+    ax.set_ylim(-0.02, 1.02)
 
-    # Colors
-    c_user = "#3b82f6"       # Blue
-    c_agent = "#6366f1"      # Indigo
-    c_retrieval = "#8b5cf6"  # Purple
-    c_sink = "#ef4444"       # Red
-    c_quarantine = "#10b981" # Green
-    c_middleware = "#f59e0b" # Amber
+    # Academic Palette
+    c_user = "#2563eb"        # Royal Blue
+    c_agent = "#4f46e5"       # Indigo
+    c_retrieval = "#7c3aed"   # Deep Purple
+    c_sink = "#dc2626"        # Crimson Red
+    c_quarantine = "#059669"  # Emerald Green
+    c_middleware = "#d97706"  # Warm Amber
 
-    # Draw Nodes
-    def draw_box(x, y, w, h, title, subtitle, color, text_color="white"):
+    def draw_box(x, y, w, h, title, subtitle, color, text_color="white", badge=None):
+        # Drop shadow effect
+        shadow = patches.FancyBboxPatch(
+            (x + 0.004, y - 0.006), w, h,
+            boxstyle="round,pad=0.03,rounding_size=0.04",
+            linewidth=0, facecolor="#cbd5e1", alpha=0.5, zorder=2
+        )
+        ax.add_patch(shadow)
+
+        # Main node patch
         rect = patches.FancyBboxPatch(
             (x, y), w, h,
-            boxstyle="round,pad=0.04,rounding_size=0.08",
-            linewidth=1.8, edgecolor=color, facecolor=color, alpha=0.9
+            boxstyle="round,pad=0.03,rounding_size=0.04",
+            linewidth=1.6, edgecolor=color, facecolor=color, alpha=0.95, zorder=3
         )
         ax.add_patch(rect)
-        ax.text(x + w/2, y + h*0.65, title, color=text_color, fontweight="bold", ha="center", va="center", fontsize=10)
-        ax.text(x + w/2, y + h*0.30, subtitle, color=text_color, style="italic", ha="center", va="center", fontsize=8.5)
+        
+        ax.text(x + w / 2, y + h * 0.63, title, color=text_color, fontweight="bold", 
+                ha="center", va="center", fontsize=10.5, zorder=4)
+        ax.text(x + w / 2, y + h * 0.32, subtitle, color="#f8fafc", style="italic", 
+                ha="center", va="center", fontsize=8.5, zorder=4)
+        if badge:
+            badge_box = dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor=color, alpha=0.95, lw=1.0)
+            ax.text(x + w / 2, y + h + 0.025, badge, color=color, fontsize=7.5, fontweight="bold",
+                    ha="center", va="bottom", bbox=badge_box, zorder=5)
 
-    def draw_arrow(x1, y1, x2, y2, label=""):
+    def draw_arrow(x1, y1, x2, y2, label="", label_pos=(0.5, 0.5), color="#334155", lw=1.8, style="-|>"):
         ax.annotate(
             "", xy=(x2, y2), xytext=(x1, y1),
-            arrowprops=dict(arrowstyle="-|>", color="#334155", lw=1.8, mutation_scale=15)
+            arrowprops=dict(arrowstyle=style, color=color, lw=lw, mutation_scale=15),
+            zorder=3
         )
         if label:
-            mx, my = (x1 + x2)/2, (y1 + y2)/2
-            ax.text(mx, my + 0.03, label, fontsize=8, ha="center", va="bottom", color="#475569", fontweight="bold")
+            mx = x1 + (x2 - x1) * label_pos[0]
+            my = y1 + (y2 - y1) * label_pos[1]
+            bbox_props = dict(boxstyle="round,pad=0.25", facecolor="white", edgecolor="#cbd5e1", alpha=0.92, lw=0.8)
+            ax.text(mx, my, label, fontsize=8, ha="center", va="center", color="#1e293b", 
+                    fontweight="bold", bbox=bbox_props, zorder=5)
 
-    # Nodes positioning
-    draw_box(0.04, 0.72, 0.22, 0.18, "User Proxy Node", "Root Trust: 1.0 (System)", c_user)
-    draw_box(0.38, 0.72, 0.24, 0.18, "Planning Agent Node", "Internal Trust: 0.85", c_agent)
-    draw_box(0.72, 0.72, 0.24, 0.18, "Retrieval Agent Node", "External Ingest (Trust: 0.10)", c_retrieval)
-    draw_box(0.72, 0.38, 0.24, 0.18, "Summarizer Agent Node", "Worker Trust: 0.60", c_agent)
+    # 1. Top Workflow Nodes
+    draw_box(0.02, 0.75, 0.22, 0.15, "User Proxy Node", "Root Trust: 1.00 (System Direct)", c_user, badge="INGRESS")
+    draw_box(0.37, 0.75, 0.23, 0.15, "Planning Agent Node", "Workflow Coordinator (Trust: 0.85)", c_agent, badge="CORE REASONING")
+    draw_box(0.73, 0.75, 0.24, 0.15, "Retrieval Agent Node", "External Search / Ingest (Trust: 0.10)", c_retrieval, badge="UNTRUSTED SINK")
 
-    # Privileged Tool Sink & Quarantine Sink
-    draw_box(0.38, 0.08, 0.24, 0.18, "Tool Execution Sink", "Privileged: Shell, DB, Funds", c_sink)
-    draw_box(0.04, 0.08, 0.22, 0.18, "Quarantine Vault Sink", "Contained & Forensic Log", c_quarantine)
+    # 2. Worker / Synthesis Node
+    draw_box(0.73, 0.38, 0.24, 0.15, "Summarizer Agent Node", "Context Aggregator (Trust: 0.60)", c_agent, badge="SYNTHESIS")
 
-    # Middleware Layer Box
+    # 3. ProvGuard Middleware Container Box
+    mw_shadow = patches.FancyBboxPatch(
+        (0.284, 0.374), 0.32, 0.21,
+        boxstyle="round,pad=0.03,rounding_size=0.04",
+        linewidth=0, facecolor="#cbd5e1", alpha=0.4, zorder=2
+    )
+    ax.add_patch(mw_shadow)
     mw_box = patches.FancyBboxPatch(
-        (0.33, 0.38), 0.34, 0.22,
-        boxstyle="round,pad=0.03,rounding_size=0.06",
-        linewidth=2.0, linestyle="--", edgecolor=c_middleware, facecolor="#fef3c7", alpha=0.85
+        (0.28, 0.38), 0.32, 0.21,
+        boxstyle="round,pad=0.03,rounding_size=0.04",
+        linewidth=2.2, linestyle="--", edgecolor=c_middleware, facecolor="#fffbeb", alpha=0.95, zorder=3
     )
     ax.add_patch(mw_box)
-    ax.text(0.50, 0.53, "ProvGuard Middleware Interception", color="#92400e", fontweight="bold", ha="center", fontsize=9.5)
-    ax.text(0.50, 0.45, "• Lineage Tracking & Dynamic Taint\n• Origin-Based Authorization (OBA)\n• Intent & Delimiter Conformance",
-            color="#78350f", ha="center", fontsize=7.5)
+    ax.text(0.44, 0.525, "ProvGuard Middleware Interception", color="#92400e", 
+            fontweight="bold", ha="center", va="center", fontsize=10.5, zorder=4)
+    ax.text(0.44, 0.44, 
+            "• End-to-End Cryptographic DAG Lineage\n• Origin-Based Authorization (OBA)\n• Intent & Multi-Factor Risk Assessment",
+            color="#78350f", ha="center", va="center", fontsize=8, linespacing=1.35, zorder=4)
 
-    # Arrows between nodes
-    draw_arrow(0.26, 0.81, 0.38, 0.81, "Task Prompt")
-    draw_arrow(0.62, 0.81, 0.72, 0.81, "Doc Query")
-    draw_arrow(0.84, 0.72, 0.84, 0.56, "Raw Docs")
-    draw_arrow(0.72, 0.47, 0.67, 0.47, "Digest")
-    draw_arrow(0.50, 0.72, 0.50, 0.60, "Tool Deleg.")
+    # 4. Sinks (Bottom Layer)
+    draw_box(0.04, 0.04, 0.26, 0.14, "Quarantine Vault Sink", "Audit Log & State Isolation", c_quarantine, badge="DEFENSE CONTAINMENT")
+    draw_box(0.45, 0.04, 0.26, 0.14, "Tool Execution Sink", "Privileged Ops: Shell / DB / APIs", c_sink, badge="TARGET ENVIRONMENT")
 
-    # Middleware Outgoing Paths
-    draw_arrow(0.50, 0.38, 0.50, 0.26, "ALLOW / SANITIZE")
-    draw_arrow(0.38, 0.44, 0.20, 0.26, "QUARANTINE (Risk >= 0.50)")
+    # Arrows - Agent Workflow
+    draw_arrow(0.24, 0.825, 0.37, 0.825, "User Prompt", label_pos=(0.5, 0.5))
+    draw_arrow(0.60, 0.825, 0.73, 0.825, "Query", label_pos=(0.5, 0.5))
+    draw_arrow(0.85, 0.75, 0.85, 0.56, "Raw Docs (Untrusted)", label_pos=(0.5, 0.5), color="#b91c1c")
+    
+    # Digest arrow between Summarizer and Middleware (box ends at 0.60, Summarizer starts at 0.73)
+    draw_arrow(0.73, 0.455, 0.605, 0.455, "Synthesized\nDigest", label_pos=(0.5, 0.5))
+    draw_arrow(0.485, 0.75, 0.485, 0.59, "Tool Delegation Call", label_pos=(0.5, 0.5))
 
-    ax.set_title("Figure 1: Multi-Agent LangGraph Architecture with Integrated ProvGuard Middleware", pad=12, fontweight="bold")
+    # Arrows - Middleware Decision Paths
+    draw_arrow(0.50, 0.38, 0.53, 0.21, "ALLOW / SANITIZE\n(Risk < 0.25)", label_pos=(0.5, 0.55), color="#047857", lw=2.0)
+    draw_arrow(0.33, 0.38, 0.19, 0.21, "QUARANTINE\n(Risk ≥ 0.50)", label_pos=(0.55, 0.55), color="#b91c1c", lw=2.0)
+
+    # Title & Metadata Caption
+    ax.set_title("Figure 1: Multi-Agent LangGraph Architecture with Integrated ProvGuard Middleware Layer", 
+                 pad=14, fontweight="bold", fontsize=12)
+
     plt.tight_layout()
     out_path = os.path.join(output_dir, "figure_1_langgraph_workflow_architecture.png")
-    plt.savefig(out_path)
+    plt.savefig(out_path, dpi=300)
     plt.close()
     print(f"[✓] Generated: {out_path}")
 
