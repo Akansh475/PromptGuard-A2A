@@ -308,45 +308,106 @@ def generate_figure_2_provenance_dag(output_dir: str):
 
 def generate_figure_3_propagation_paths(output_dir: str):
     """Figure 3: Adversarial Propagation Paths across Defense Paradigms."""
-    fig, ax = plt.subplots(figsize=(11, 5.5))
+    fig, ax = plt.subplots(figsize=(12, 6.2))
     ax.axis("off")
+    ax.set_xlim(-0.02, 1.02)
+    ax.set_ylim(-0.02, 1.02)
 
-    stages = ["External Web\n(Untrusted Doc)", "Retrieval\nAgent", "Summarizer\nAgent", "Planning\nAgent", "Tool Executor\n(Privileged Sink)"]
-    x_positions = [0.10, 0.30, 0.50, 0.70, 0.90]
+    # Stages and X positions
+    stages = [
+        "Stage 0: Ingestion\n(External Untrusted Doc)", 
+        "Stage 1: Synthesis\n(Worker Agent)", 
+        "Stage 2: Coordination\n(Planning Agent)", 
+        "Stage 3: Privileged Tool\n(OS / DB / Financial Sink)"
+    ]
+    x_stages = [0.28, 0.48, 0.68, 0.88]
 
-    for x, s in zip(x_positions, stages):
-        ax.text(x, 0.88, s, ha="center", va="center", fontweight="bold", fontsize=9.5, color="#1e293b")
-        ax.plot([x, x], [0.15, 0.80], color="#e2e8f0", linestyle="--", lw=1.2, zorder=1)
+    # Draw vertical dashed guide lines and stage headers
+    for x, s in zip(x_stages, stages):
+        ax.plot([x, x], [0.18, 0.77], color="#e2e8f0", linestyle="--", lw=1.4, zorder=1)
+        stage_box = dict(boxstyle="round,pad=0.35,rounding_size=0.04", facecolor="#f8fafc", edgecolor="#cbd5e1", lw=1.2)
+        ax.text(x, 0.86, s, ha="center", va="center", fontweight="bold", fontsize=9.0, 
+                color="#1e293b", bbox=stage_box, zorder=3)
 
-    # 1. Baseline
+    # 1. Baseline Path (Red)
     y_base = 0.65
-    ax.text(0.01, y_base, "Baseline MAS\n(No Defense)", va="center", fontsize=8.5, fontweight="bold", color="#ef4444")
-    ax.plot(x_positions, [y_base]*5, color="#ef4444", lw=3, zorder=2)
-    ax.scatter(x_positions[:-1], [y_base]*4, color="#ef4444", s=90, zorder=3)
-    ax.scatter([x_positions[-1]], [y_base], color="#991b1b", marker="X", s=220, zorder=4)
-    ax.text(x_positions[-1], y_base + 0.05, "BREACH\n(4 Hops)", ha="center", color="#991b1b", fontweight="bold", fontsize=8)
+    lane_base = patches.FancyBboxPatch(
+        (0.01, y_base - 0.06), 0.19, 0.12,
+        boxstyle="round,pad=0.02,rounding_size=0.03",
+        linewidth=1.2, edgecolor="#dc2626", facecolor="#fef2f2", zorder=2
+    )
+    ax.add_patch(lane_base)
+    ax.text(0.105, y_base + 0.02, "Baseline MAS", ha="center", va="center", 
+            fontweight="bold", fontsize=9.5, color="#991b1b", zorder=3)
+    ax.text(0.105, y_base - 0.03, "No Defense Layer\nASR: 91.0% | Depth: 1.91", ha="center", va="center", 
+            fontsize=7.5, color="#b91c1c", zorder=3)
 
-    # 2. Traditional Perimeter
-    y_trad = 0.42
-    ax.text(0.01, y_trad, "Traditional\nPerimeter Filter", va="center", fontsize=8.5, fontweight="bold", color="#f59e0b")
-    ax.plot(x_positions, [y_trad]*5, color="#f59e0b", lw=3, zorder=2)
-    ax.scatter(x_positions[:-1], [y_trad]*4, color="#f59e0b", s=90, zorder=3)
-    ax.scatter([x_positions[-1]], [y_trad], color="#b45309", marker="X", s=220, zorder=4)
-    ax.text(x_positions[-1], y_trad + 0.05, "BREACH\n(Perimeter Blindspot)", ha="center", color="#b45309", fontweight="bold", fontsize=8)
+    # Path line
+    ax.plot(x_stages, [y_base] * 4, color="#dc2626", lw=3.2, zorder=2)
+    ax.scatter(x_stages[:-1], [y_base] * 3, color="#dc2626", s=110, edgecolor="#991b1b", lw=1.5, zorder=3)
+    ax.scatter([x_stages[-1]], [y_base], color="#991b1b", marker="X", s=280, lw=2.2, zorder=4)
+    breach_box1 = dict(boxstyle="round,pad=0.25", facecolor="#fee2e2", edgecolor="#dc2626", lw=1.2)
+    ax.text(x_stages[-1], y_base + 0.065, "BREACH (Reaches Sink)\nFull Exploitation", ha="center", 
+            color="#991b1b", fontweight="bold", fontsize=8.0, bbox=breach_box1, zorder=5)
 
-    # 3. ProvGuard-MAS
-    y_prov = 0.20
-    ax.text(0.01, y_prov, "ProvGuard-MAS\n(Our Defense)", va="center", fontsize=8.5, fontweight="bold", color="#10b981")
-    ax.plot(x_positions[:3], [y_prov]*3, color="#10b981", lw=3, zorder=2)
-    ax.scatter(x_positions[:2], [y_prov]*2, color="#10b981", s=90, zorder=3)
-    # Intercept marker at hop 2/3
-    ax.scatter([x_positions[2]], [y_prov], color="#047857", marker="s", s=220, zorder=4)
-    ax.text(x_positions[2], y_prov + 0.05, "CONTAINED\n(Quarantined at Hop 2)", ha="center", color="#047857", fontweight="bold", fontsize=8)
+    # 2. Traditional Perimeter Path (Orange)
+    y_trad = 0.44
+    lane_trad = patches.FancyBboxPatch(
+        (0.01, y_trad - 0.06), 0.19, 0.12,
+        boxstyle="round,pad=0.02,rounding_size=0.03",
+        linewidth=1.2, edgecolor="#d97706", facecolor="#fffbeb", zorder=2
+    )
+    ax.add_patch(lane_trad)
+    ax.text(0.105, y_trad + 0.02, "Traditional Perimeter", ha="center", va="center", 
+            fontweight="bold", fontsize=9.5, color="#92400e", zorder=3)
+    ax.text(0.105, y_trad - 0.03, "Input-Only Filtering\nASR: 91.0% | Depth: 1.91", ha="center", va="center", 
+            fontsize=7.5, color="#b45309", zorder=3)
 
-    ax.set_title("Figure 3: Adversarial Propagation Depth Comparison across Multi-Agent Workflows", pad=12, fontweight="bold")
+    # Path line
+    ax.plot(x_stages, [y_trad] * 4, color="#d97706", lw=3.2, zorder=2)
+    ax.scatter(x_stages[:-1], [y_trad] * 3, color="#d97706", s=110, edgecolor="#92400e", lw=1.5, zorder=3)
+    ax.scatter([x_stages[-1]], [y_trad], color="#92400e", marker="X", s=280, lw=2.2, zorder=4)
+    breach_box2 = dict(boxstyle="round,pad=0.25", facecolor="#fef3c7", edgecolor="#d97706", lw=1.2)
+    ax.text(x_stages[-1], y_trad + 0.065, "BREACH (Blindspot)\nInternal Hops Missed", ha="center", 
+            color="#92400e", fontweight="bold", fontsize=8.0, bbox=breach_box2, zorder=5)
+
+    # 3. ProvGuard-MAS Path (Green)
+    y_prov = 0.23
+    lane_prov = patches.FancyBboxPatch(
+        (0.01, y_prov - 0.06), 0.19, 0.12,
+        boxstyle="round,pad=0.02,rounding_size=0.03",
+        linewidth=1.2, edgecolor="#059669", facecolor="#ecfdf5", zorder=2
+    )
+    ax.add_patch(lane_prov)
+    ax.text(0.105, y_prov + 0.02, "ProvGuard-MAS", ha="center", va="center", 
+            fontweight="bold", fontsize=9.5, color="#065f46", zorder=3)
+    ax.text(0.105, y_prov - 0.03, "Provenance Tracking + OBA\nASR: 0.0% | Depth: 0.39", ha="center", va="center", 
+            fontsize=7.5, color="#047857", zorder=3)
+
+    # Path line intercepted before execution
+    ax.plot([x_stages[0], x_stages[1]], [y_prov, y_prov], color="#059669", lw=3.2, zorder=2)
+    ax.scatter([x_stages[0]], [y_prov], color="#059669", s=110, edgecolor="#065f46", lw=1.5, zorder=3)
+    ax.scatter([x_stages[1]], [y_prov], color="#047857", marker="s", s=240, edgecolor="#065f46", lw=1.5, zorder=4)
+    contain_box = dict(boxstyle="round,pad=0.25", facecolor="#d1fae5", edgecolor="#059669", lw=1.2)
+    ax.text(x_stages[1], y_prov + 0.065, "CONTAINED (Quarantined at Ingress/Synthesis)\nZero Sink Penetration (Mean Depth = 0.39)", 
+            ha="center", color="#065f46", fontweight="bold", fontsize=8.0, bbox=contain_box, zorder=5)
+
+    # Bottom Empirical Verification Banner
+    banner_rect = patches.FancyBboxPatch(
+        (0.01, 0.03), 0.98, 0.08,
+        boxstyle="round,pad=0.02,rounding_size=0.02",
+        linewidth=1.0, edgecolor="#64748b", facecolor="#f1f5f9", zorder=2
+    )
+    ax.add_patch(banner_rect)
+    ax.text(0.50, 0.07, 
+            "Empirical Benchmark Finding (N=150): ProvGuard-MAS truncates adversarial propagation from 1.91 hops to 0.39 hops (-1.52 hops, 79.6% early containment),\nprecluding compromised context from ever triggering privileged system sinks.",
+            ha="center", va="center", fontsize=8.2, color="#334155", zorder=3)
+
+    ax.set_title("Figure 3: Adversarial Propagation Depth Comparison across Multi-Agent Workflows", 
+                 pad=18, fontweight="bold", fontsize=12)
     plt.tight_layout()
     out_path = os.path.join(output_dir, "figure_3_attack_propagation_paths.png")
-    plt.savefig(out_path)
+    plt.savefig(out_path, dpi=300)
     plt.close()
     print(f"[✓] Generated: {out_path}")
 
