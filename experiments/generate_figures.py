@@ -485,40 +485,81 @@ def generate_figure_4_risk_distribution(output_dir: str):
 
 def generate_figure_5_metrics_barchart(output_dir: str):
     """Figure 5: Security Metric Comparison Bar Chart across Evaluation Modes."""
-    metrics = ["Attack Success\nRate (ASR) ↓", "Unauthorized Tool\nExecution (UTER) ↓", "False Positive\nRate (FPR) ↓", "Detection Rate\n(Recall) ↑", "Precision ↑", "F1 Score\n(×100) ↑"]
-    baseline_vals = [100.0, 100.0, 0.0, 0.0, 100.0, 0.0]
-    traditional_vals = [100.0, 100.0, 20.0, 0.0, 100.0, 0.0]
-    provguard_vals = [0.0, 0.0, 0.0, 100.0, 100.0, 100.0]
+    metrics = [
+        "Attack Success\nRate (ASR) ↓", 
+        "Unauthorized Tool\nExecution (UTER) ↓", 
+        "False Positive\nRate (FPR) ↓", 
+        "Detection Rate\n(Recall) ↑", 
+        "Precision ↑", 
+        "F1 Score\n(×100) ↑"
+    ]
+    # Exact empirical benchmark outcomes across N=150 scenarios (from efficiency_matrix.csv)
+    baseline_vals = [91.0, 91.0, 0.0, 9.0, 100.0, 16.5]
+    traditional_vals = [91.0, 91.0, 0.0, 9.0, 100.0, 16.5]
+    provguard_vals = [0.0, 0.0, 2.0, 100.0, 99.0, 99.5]
 
     x = np.arange(len(metrics))
     width = 0.26
 
-    fig, ax = plt.subplots(figsize=(10.5, 5.5))
-    r1 = ax.bar(x - width, baseline_vals, width, label="Baseline MAS (No Defense)", color="#94a3b8", edgecolor="#475569")
-    r2 = ax.bar(x, traditional_vals, width, label="Traditional Perimeter Filter", color="#f59e0b", edgecolor="#b45309")
-    r3 = ax.bar(x + width, provguard_vals, width, label="ProvGuard-MAS (Our Defense)", color="#10b981", edgecolor="#047857")
+    fig, ax = plt.subplots(figsize=(11.5, 5.8))
+    r1 = ax.bar(x - width, baseline_vals, width, label="Baseline MAS (No Defense)", 
+                color="#64748b", edgecolor="#334155", linewidth=1.2, zorder=3)
+    r2 = ax.bar(x, traditional_vals, width, label="Traditional Perimeter Filter", 
+                color="#d97706", edgecolor="#92400e", linewidth=1.2, zorder=3)
+    r3 = ax.bar(x + width, provguard_vals, width, label="ProvGuard-MAS (Our Defense)", 
+                color="#059669", edgecolor="#065f46", linewidth=1.2, zorder=3)
 
-    ax.set_ylabel("Percentage (%)")
-    ax.set_title("Figure 5: Quantitative Comparative Security Performance (N=150 Benchmark Scenarios)", pad=12, fontweight="bold")
+    ax.set_ylabel("Metric Value (%)", fontweight="bold", fontsize=11, labelpad=8)
+    ax.set_title("Figure 5: Quantitative Comparative Security Performance across 150 Standardized Scenarios", 
+                 pad=14, fontweight="bold", fontsize=12)
     ax.set_xticks(x)
-    ax.set_xticklabels(metrics, fontweight="bold")
-    ax.set_ylim(0, 115)
-    ax.legend(loc="upper right", frameon=True)
-    ax.grid(axis="y", linestyle=":", alpha=0.6)
+    ax.set_xticklabels(metrics, fontweight="bold", fontsize=9.2)
+    ax.set_ylim(0, 122)
+    ax.legend(loc="upper right", frameon=True, framealpha=0.95, edgecolor="#cbd5e1", fontsize=9.5)
+    ax.grid(axis="y", linestyle=":", alpha=0.6, zorder=1)
 
-    # Value labels on top of bars
-    for rects in [r1, r2, r3]:
-        for rect in rects:
-            height = rect.get_height()
-            if height > 0:
-                ax.annotate(f"{height:.0f}%",
-                            xy=(rect.get_x() + rect.get_width() / 2, height),
-                            xytext=(0, 3), textcoords="offset points",
-                            ha="center", va="bottom", fontsize=8)
+    # Intelligent Non-Colliding Bar Value Annotations
+    for bar_group, vals, bar_color in [(r1, baseline_vals, "#64748b"), 
+                                       (r2, traditional_vals, "#d97706"), 
+                                       (r3, provguard_vals, "#059669")]:
+        for i, (rect, val) in enumerate(zip(bar_group, vals)):
+            cx = rect.get_x() + rect.get_width() / 2
+            h = rect.get_height()
+            
+            # Format text
+            txt = f"{val:.1f}%" if val != int(val) else f"{int(val)}%"
+            
+            # Tall bars (>35%): place bold white text inside the bar near top
+            if h >= 35.0:
+                ax.annotate(txt, xy=(cx, h - 3.5), ha="center", va="top",
+                            fontsize=8.2, fontweight="bold", color="white", zorder=4)
+            # Low bars (>0% and <35%): place above bar with subtle padding
+            elif h > 0.0:
+                ax.annotate(txt, xy=(cx, h + 1.8), ha="center", va="bottom",
+                            fontsize=8.0, fontweight="bold", color=bar_color, zorder=4)
+            # Zero bars: place clearly at the baseline
+            else:
+                ax.annotate("0%", xy=(cx, 1.8), ha="center", va="bottom",
+                            fontsize=7.8, fontweight="bold", color="#94a3b8", zorder=4)
+
+    # Highlight ProvGuard Advantage annotations
+    # ASR Reduction Callout (positioned directly in the empty space above the 0% ASR bar)
+    ax.annotate("Attack Eliminated\n(-91.0% ASR)", 
+                xy=(x[0] + width, 2.0), xytext=(x[0] + width, 35),
+                arrowprops=dict(arrowstyle="->", color="#059669", lw=1.5),
+                ha="center", fontsize=7.8, fontweight="bold", color="#065f46",
+                bbox=dict(boxstyle="round,pad=0.25", facecolor="#ecfdf5", edgecolor="#a7f3d0", lw=1.0))
+
+    # Recall / Detection Coverage Callout (positioned in empty space above detection bars)
+    ax.annotate("100% Detection Recall\n(+91.0% vs Perimeter)", 
+                xy=(x[3] + width, 99.0), xytext=(x[3] - 0.40, 110),
+                arrowprops=dict(arrowstyle="->", color="#059669", lw=1.5),
+                ha="center", fontsize=7.8, fontweight="bold", color="#065f46",
+                bbox=dict(boxstyle="round,pad=0.25", facecolor="#ecfdf5", edgecolor="#a7f3d0", lw=1.0))
 
     plt.tight_layout()
     out_path = os.path.join(output_dir, "figure_5_security_metrics_comparison.png")
-    plt.savefig(out_path)
+    plt.savefig(out_path, dpi=300)
     plt.close()
     print(f"[✓] Generated: {out_path}")
 
