@@ -155,62 +155,153 @@ def generate_figure_1_architecture(output_dir: str):
 
 def generate_figure_2_provenance_dag(output_dir: str):
     """Figure 2: Cryptographic Provenance DAG Lineage Tree."""
-    fig, ax = plt.subplots(figsize=(10, 6.5))
+    fig, ax = plt.subplots(figsize=(11.5, 7.2))
     ax.axis("off")
+    ax.set_xlim(-0.02, 1.02)
+    ax.set_ylim(-0.02, 1.02)
 
-    def draw_record(x, y, w, h, role, origin, trust, taint, action, hash_val, is_blocked=False):
-        ec = "#ef4444" if is_blocked else "#3b82f6"
-        fc = "#fee2e2" if is_blocked else "#eff6ff"
+    def draw_record(x, y, w, h, role, origin, trust, taint, action, hash_val, is_blocked=False, badge=""):
+        ec = "#dc2626" if is_blocked else "#2563eb"
+        fc = "#fef2f2" if is_blocked else "#f0f7ff"
+        header_c = "#991b1b" if is_blocked else "#1e40af"
+
+        # Shadow
+        shadow = patches.FancyBboxPatch(
+            (x + 0.004, y - 0.005), w, h,
+            boxstyle="round,pad=0.03,rounding_size=0.04",
+            linewidth=0, facecolor="#cbd5e1", alpha=0.45, zorder=2
+        )
+        ax.add_patch(shadow)
+
+        # Card container
         rect = patches.FancyBboxPatch(
             (x, y), w, h,
-            boxstyle="round,pad=0.03,rounding_size=0.06",
-            linewidth=1.8, edgecolor=ec, facecolor=fc
+            boxstyle="round,pad=0.03,rounding_size=0.04",
+            linewidth=1.8, edgecolor=ec, facecolor=fc, zorder=3
         )
         ax.add_patch(rect)
-        ax.text(x + 0.02, y + h - 0.03, f"{role}", fontweight="bold", fontsize=9.5, color="#1e3a8a" if not is_blocked else "#991b1b")
-        info = (
-            f"Origin ID: {origin}\n"
-            f"Root Trust: {trust:.2f} | Taint Index: {taint:.2f}\n"
-            f"Content Hash: {hash_val[:16]}...\n"
-            f"Action: {action}"
-        )
-        ax.text(x + 0.02, y + 0.02, info, fontsize=8, color="#334155", linespacing=1.25)
 
-    def draw_link(x1, y1, x2, y2, label=""):
+        # Header bar
+        header_rect = patches.FancyBboxPatch(
+            (x, y + h - 0.05), w, 0.05,
+            boxstyle="round,pad=0.01,rounding_size=0.02",
+            linewidth=0, facecolor="#fee2e2" if is_blocked else "#dbeafe", zorder=4
+        )
+        ax.add_patch(header_rect)
+        ax.text(x + 0.02, y + h - 0.025, f"{role}", fontweight="bold", fontsize=9.5, 
+                color=header_c, va="center", zorder=5)
+
+        if badge:
+            badge_bbox = dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor=ec, lw=1.0)
+            ax.text(x + w - 0.02, y + h - 0.025, badge, fontweight="bold", fontsize=7.5,
+                    color=ec, ha="right", va="center", bbox=badge_bbox, zorder=5)
+
+        info = (
+            f"Origin Node: {origin}\n"
+            f"Root Trust Authority: {trust:.2f}  |  Taint Score: {taint:.2f}\n"
+            f"SHA-256 Digest: {hash_val}\n"
+            f"Operation / Action: {action}"
+        )
+        ax.text(x + 0.02, y + 0.03, info, fontsize=8.2, color="#1e293b", 
+                linespacing=1.45, family="monospace", va="bottom", zorder=5)
+
+    def draw_link(x1, y1, x2, y2, label="", color="#475569", lw=1.8):
         ax.annotate(
             "", xy=(x2, y2), xytext=(x1, y1),
-            arrowprops=dict(arrowstyle="-|>", color="#64748b", lw=1.8, mutation_scale=14)
+            arrowprops=dict(arrowstyle="-|>", color=color, lw=lw, mutation_scale=14),
+            zorder=3
         )
         if label:
-            mx, my = (x1 + x2)/2, (y1 + y2)/2
-            ax.text(mx, my, label, fontsize=7.5, style="italic", ha="center", va="center",
-                    bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1"))
+            mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+            ax.text(mx, my, label, fontsize=8, ha="center", va="center", color="#0f172a",
+                    fontweight="bold", bbox=dict(boxstyle="round,pad=0.25", facecolor="white", 
+                                                edgecolor="#94a3b8", alpha=0.96, lw=0.9), zorder=6)
 
-    # Records in causal lineage
-    draw_record(0.05, 0.70, 0.40, 0.22, "1. Ingestion Record (Retrieval)", "untrusted_web_doc_99", 0.10, 0.90, "INGEST_UNTRUSTED", "7f83b1657ff1fc53")
-    draw_record(0.55, 0.70, 0.40, 0.22, "2. Synthesis Record (Summarizer)", "untrusted_web_doc_99", 0.10, 0.92, "SUMMARIZE_AND_SYNTHESIZE", "a3b4c5d6e7f80123")
-    draw_record(0.55, 0.35, 0.40, 0.22, "3. Planning Record (Planner)", "untrusted_web_doc_99", 0.10, 0.94, "DELEGATE_TOOL_INVOCATION", "b5c6d7e8f9012345")
-    draw_record(0.05, 0.06, 0.45, 0.24, "4. ProvGuard OBA Verdict", "untrusted_web_doc_99", 0.10, 0.94, "QUARANTINE (Risk = 0.89)", "N/A - Execution Denied", is_blocked=True)
+    # 1. Lineage DAG Records (2-Column Grid with generous 0.24 central gap)
+    w_card = 0.35
+    x_left = 0.03
+    x_right = 0.62
 
-    # Connections
-    draw_link(0.45, 0.81, 0.55, 0.81, "derive_child(hop=1)")
-    draw_link(0.75, 0.70, 0.75, 0.57, "derive_child(hop=2)")
-    draw_link(0.55, 0.42, 0.40, 0.28, "Origin-Based Authorization Check\nRoot Trust 0.10 < Req. 0.95")
+    # Hop 0: Untrusted Ingestion (Top Left)
+    draw_record(x_left, 0.70, w_card, 0.22, "1. Ingestion Record", 
+                "untrusted_web_doc_99", 0.10, 0.90, "INGEST_UNTRUSTED", "7f83b165...e4b9", 
+                badge="TAINT ROOT")
 
-    # Legend / Annotation Box
-    ann = (
-        "Provenance Invariants Enforced:\n"
-        "• Cryptographic Content Integrity via SHA-256 digests\n"
-        "• Monotonic Taint Accumulation: T(m_i) >= T(m_{i-1})\n"
-        "• Origin-Based Authorization (OBA) binds authority to Origin, defeating Confused Deputy"
+    # Hop 1: Synthesis (Top Right)
+    draw_record(x_right, 0.70, w_card, 0.22, "2. Synthesis Record", 
+                "untrusted_web_doc_99", 0.10, 0.92, "SUMMARIZE_AND_SYNTHESIZE", "a3b4c5d6...80f1",
+                badge="HOP 1")
+
+    # Hop 2: Delegated privileged tool call (Bottom Right)
+    draw_record(x_right, 0.38, w_card, 0.22, "3. Planning Record", 
+                "untrusted_web_doc_99", 0.10, 0.94, "DELEGATE_TOOL_INVOCATION", "b5c6d7e8...1234",
+                badge="CONFUSED DEPUTY")
+
+    # Hop 3: ProvGuard Interception & Containment (Bottom Left)
+    draw_record(x_left, 0.38, w_card, 0.22, "4. ProvGuard Verdict", 
+                "untrusted_web_doc_99", 0.10, 0.94, "QUARANTINE_AND_TERMINATE", "N/A [BLOCKED AT BOUNDARY]", 
+                is_blocked=True, badge="ACTION DENIED")
+
+    # 2. Directed Edges & Interception Gate
+    # Edge 1 -> 2
+    draw_link(x_left + w_card, 0.81, x_right, 0.81, "derive_child(hop=1)")
+    
+    # Edge 2 -> 3 (Vertical)
+    draw_link(x_right + w_card / 2, 0.70, x_right + w_card / 2, 0.60, "derive_child(hop=2)")
+
+    # Central OBA Verification Gate in the middle gap
+    gate_x = 0.44
+    gate_y = 0.40
+    gate_w = 0.12
+    gate_h = 0.18
+    gate_rect = patches.FancyBboxPatch(
+        (gate_x, gate_y), gate_w, gate_h,
+        boxstyle="round,pad=0.015,rounding_size=0.03",
+        linewidth=1.8, edgecolor="#b91c1c", facecolor="#fff1f2", zorder=4
     )
-    ax.text(0.55, 0.14, ann, fontsize=8, color="#0f172a",
-            bbox=dict(boxstyle="round,pad=0.4", facecolor="#f1f5f9", edgecolor="#94a3b8"))
+    ax.add_patch(gate_rect)
+    ax.text(gate_x + gate_w / 2, gate_y + gate_h * 0.78, "OBA Gate", 
+            fontweight="bold", fontsize=9.0, color="#991b1b", ha="center", va="center", zorder=5)
+    ax.text(gate_x + gate_w / 2, gate_y + gate_h * 0.44, "Root: 0.10\nPolicy: 0.95\n[DENIED]", 
+            fontweight="bold", fontsize=7.8, color="#7f1d1d", ha="center", va="center", family="monospace", linespacing=1.35, zorder=5)
 
-    ax.set_title("Figure 2: Dynamic Provenance DAG Tracking and Origin-Based Authorization", pad=12, fontweight="bold")
+    # Directed Links through OBA Gate (Node 3 -> Gate -> Node 4)
+    draw_link(x_right, 0.49, gate_x + gate_w + 0.01, 0.49, color="#b91c1c", lw=1.8)
+    draw_link(gate_x - 0.01, 0.49, x_left + w_card, 0.49, color="#dc2626", lw=2.2)
+
+    # 3. Provenance Guarantees & Formal Invariants Panel
+    panel_rect = patches.FancyBboxPatch(
+        (0.03, 0.04), 0.94, 0.25,
+        boxstyle="round,pad=0.03,rounding_size=0.04",
+        linewidth=1.4, edgecolor="#0284c7", facecolor="#f0f9ff", zorder=3
+    )
+    ax.add_patch(panel_rect)
+
+    ax.text(0.05, 0.245, "PROVGUARD-MAS FORMAL LINEAGE INVARIANTS & SECURITY GUARANTEES", 
+            fontweight="bold", fontsize=9.5, color="#0369a1", va="top", zorder=4)
+
+    col1 = (
+        "• Cryptographic Integrity: Message state hash h_i = SHA-256(m_i || h_{i-1}) guarantees causal immutability.\n"
+        "• Monotonic Taint Accumulation: Taint(m_i) = max(Taint(m_{i-1}), T_new), preventing payload sanitization bypass.\n"
+        "• Non-Repudiable Audit: Complete causal DAG path preserved in Forensic Vault for offline post-mortem."
+    )
+    ax.text(0.05, 0.12, col1, fontsize=8.2, color="#0c4a6e", linespacing=1.35, va="center", zorder=4)
+
+    col2 = (
+        "Origin-Based Authorization (OBA) Invariant:\n"
+        "∀ Tool Invocation τ with security threshold θ_τ:\n"
+        "Execute(τ) ⇔ Trust(Root(m_i)) ≥ θ_τ\n"
+        "Result: Planner authority overridden; payload quarantined."
+    )
+    ax.text(0.95, 0.12, col2, fontsize=8.2, color="#0c4a6e", linespacing=1.35, 
+            va="center", ha="right", style="italic", zorder=4)
+
+    ax.set_title("Figure 2: Dynamic Cryptographic Provenance DAG Tracking and Origin-Based Authorization", 
+                 pad=14, fontweight="bold", fontsize=12)
+
     plt.tight_layout()
     out_path = os.path.join(output_dir, "figure_2_provenance_dag_lineage.png")
-    plt.savefig(out_path)
+    plt.savefig(out_path, dpi=300)
     plt.close()
     print(f"[✓] Generated: {out_path}")
 
