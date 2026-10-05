@@ -16,7 +16,7 @@ Furthermore, ProvGuard-MAS delivers an end-to-end mean runtime execution latency
 
 ## 📊 Comprehensive Efficiency Matrix (Baseline vs. Traditional Method vs. ProvGuard-MAS)
 
-*Evaluated across 150 Standardized LangGraph Multi-Agent Scenarios (100 Adversarial, 50 Benign).*
+*Evaluated across 150 Standardized LangGraph Multi--Agent Scenarios (100 Adversarial, 50 Benign).*
 
 | Evaluation Metric | Baseline MAS (Unprotected) | Traditional Perimeter Filter | ProvGuard-MAS (Our Framework) | Delta vs Traditional Method |
 | :--- | :---: | :---: | :---: | :---: |
