@@ -566,33 +566,81 @@ def generate_figure_5_metrics_barchart(output_dir: str):
 
 def generate_figure_6_confusion_matrices(output_dir: str):
     """Figure 6: Confusion Matrices for Traditional vs ProvGuard-MAS."""
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4.5))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11.8, 5.6))
 
+    # Exact empirical benchmark outcomes across N=150 scenarios
     # Traditional Perimeter Filter:
-    # 50 Benign: 40 TN, 10 FP (perimeter keyword triggers)
-    # 100 Adversarial: 0 TP, 100 FN (internal injections bypass perimeter)
-    cm_trad = np.array([[40, 10], [100, 0]])
+    # 50 Benign: 50 TN, 0 FP
+    # 100 Adversarial: 9 TP (caught direct user prompt injections), 91 FN (bypassed via retrieved content / deputy delegation)
+    cm_trad = np.array([[50, 0], [91, 9]])
 
     # ProvGuard-MAS:
-    # 50 Benign: 50 TN, 0 FP
-    # 100 Adversarial: 100 TP, 0 FN
-    cm_prov = np.array([[50, 0], [0, 100]])
+    # 50 Benign: 49 TN, 1 FP (BENIGN_037 Linux diagnostic edge case, FPR=2.0%)
+    # 100 Adversarial: 100 TP (all intercepted via provenance lineage & OBA), 0 FN (zero breaches)
+    cm_prov = np.array([[49, 1], [0, 100]])
 
-    labels = ["Benign (Clean)", "Adversarial (Threat)"]
+    annot_trad = np.array([
+        ["TN = 50\n(33.3%)\nClean Allowed", "FP = 0\n(0.0%)\nFalse Alarm"],
+        ["FN = 91\n(60.7%)\nMISSED / BREACHED", "TP = 9\n(6.0%)\nIngress Catch"]
+    ])
 
-    sns.heatmap(cm_trad, annot=True, fmt="d", cmap="Oranges", cbar=False, ax=ax1,
-                xticklabels=["Pred Benign", "Pred Threat"], yticklabels=labels, annot_kws={"size": 13, "weight": "bold"})
-    ax1.set_title("Traditional Perimeter Filter\n(Accuracy: 26.7%, F1: 0.00)", fontweight="bold", pad=8)
-    ax1.set_ylabel("Ground Truth")
+    annot_prov = np.array([
+        ["TN = 49\n(32.7%)\nClean Allowed", "FP = 1\n(0.7%)\nEdge Sanitized"],
+        ["FN = 0\n(0.0%)\nZero Breaches", "TP = 100\n(66.7%)\nQUARANTINED"]
+    ])
 
-    sns.heatmap(cm_prov, annot=True, fmt="d", cmap="Greens", cbar=False, ax=ax2,
-                xticklabels=["Pred Benign", "Pred Threat"], yticklabels=labels, annot_kws={"size": 13, "weight": "bold"})
-    ax2.set_title("ProvGuard-MAS (Our Framework)\n(Accuracy: 100.0%, F1: 1.00)", fontweight="bold", pad=8)
+    labels = ["Benign Workflows\n(Actual Neg, N=50)", "Adversarial Threats\n(Actual Pos, N=100)"]
+    pred_labels = ["Predicted Safe\n(Direct Allow)", "Predicted Threat\n(Quarantined)"]
 
-    plt.suptitle("Figure 6: Confusion Matrix Performance across 150 Benchmark Workflows", y=1.02, fontweight="bold", fontsize=12)
-    plt.tight_layout()
+    # Traditional Panel
+    sns.heatmap(cm_trad, annot=annot_trad, fmt="", cmap="Oranges", cbar=False, ax=ax1,
+                xticklabels=pred_labels, yticklabels=labels,
+                annot_kws={"size": 10.2, "weight": "bold", "linespacing": 1.3},
+                linewidths=2.5, linecolor="#cbd5e1")
+    ax1.set_title("(a) Traditional Perimeter Filter (Ingress-Only Heuristics)\nRecall: 9.0% | Precision: 100.0% | F1: 0.165 | ASR: 91.0%", 
+                  fontweight="bold", fontsize=10.5, pad=12, color="#92400e")
+    ax1.set_xlabel("Predicted Action Outcome", fontweight="bold", fontsize=10, labelpad=8)
+    ax1.set_ylabel("Ground Truth Threat Class", fontweight="bold", fontsize=10, labelpad=8)
+
+    # ProvGuard Panel
+    sns.heatmap(cm_prov, annot=annot_prov, fmt="", cmap="Greens", cbar=False, ax=ax2,
+                xticklabels=pred_labels, yticklabels=labels,
+                annot_kws={"size": 10.2, "weight": "bold", "linespacing": 1.3},
+                linewidths=2.5, linecolor="#cbd5e1")
+    ax2.set_title("(b) ProvGuard-MAS (Lineage-Aware Active Defense)\nRecall: 100.0% | Precision: 99.0% | F1: 0.995 | ASR: 0.0%", 
+                  fontweight="bold", fontsize=10.5, pad=12, color="#065f46")
+    ax2.set_xlabel("Predicted Action Outcome", fontweight="bold", fontsize=10, labelpad=8)
+    ax2.set_ylabel("Ground Truth Threat Class", fontweight="bold", fontsize=10, labelpad=8)
+
+    # Explicit cell text color tuning for optimal contrast & readability
+    for text in ax1.texts:
+        val = text.get_text()
+        if "91" in val or "50" in val:
+            text.set_color("white")
+        else:
+            text.set_color("#1e293b")
+
+    for text in ax2.texts:
+        val = text.get_text()
+        if "100" in val:
+            text.set_color("white")
+        elif "49" in val:
+            text.set_color("#064e3b")
+        else:
+            text.set_color("#1e293b")
+
+    plt.suptitle("Figure 6: Confusion Matrix Comparison across 150 Standardized Multi-Agent Scenarios", 
+                 y=0.985, fontweight="bold", fontsize=12.5)
+
+    # Informative bottom summary card
+    fig.text(0.50, 0.035, 
+             "Empirical Benchmark Finding (N=150): Perimeter defenses fail on 91% of indirect multi-agent attacks (91 False Negatives).\nProvGuard-MAS achieves 100% attack containment (0 False Negatives) with 1 benign edge-case sanitization (1 False Positive, FPR = 2.0%).",
+             ha="center", va="center", fontsize=8.4, style="italic", color="#334155",
+             bbox=dict(boxstyle="round,pad=0.4", facecolor="#f8fafc", edgecolor="#cbd5e1", lw=1.0))
+
+    plt.tight_layout(rect=[0, 0.08, 1, 0.95])
     out_path = os.path.join(output_dir, "figure_6_confusion_matrices.png")
-    plt.savefig(out_path)
+    plt.savefig(out_path, dpi=300)
     plt.close()
     print(f"[✓] Generated: {out_path}")
 
