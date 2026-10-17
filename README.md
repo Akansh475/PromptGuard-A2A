@@ -9,7 +9,7 @@ A modular Python library for security benchmarking, defense mechanisms, and prov
 
 ## Overview
 
-PromptGuard-A2A provides a robust framework for evaluating and defending agent-based workflows against security risks. It features modular components for agents, benchmarking, defense, and evaluation, integrated with command-line tools and visualization utilities. The library supports advanced provenance and lineage analysis, offers extensibility for custom agent logic, and leverages machine learning libraries for data-driven reporting.
+PromptGuard-A2A provides a robust framework for evaluating and defending agent-based workflows against security risks. It features modular components  agents, benchmarking, defense, and evaluation, integrated with command-line tools and visualization utilities. The library supports advanced provenance and lineage analysis, offers extensibility for custom agent logic, and leverages machine learning libraries for data-driven reporting.
 
 ## Tech Stack
 
