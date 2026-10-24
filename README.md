@@ -13,7 +13,7 @@ PromptGuard-A2A provides a robust framework for evaluating and defending agent-b
 
 ## Tech Stack
 
-- **Languages:** Python, CSS, HTML, JavaScript, TeX
+
 - **Frameworks/Libraries:**
   - pydantic
   - rich
